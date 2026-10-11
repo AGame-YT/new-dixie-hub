@@ -1,0 +1,185 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id              String                   @id @default(cuid())
+  email           String                   @unique
+  name            String?
+  image           String?
+  isDemo          Boolean                  @default(false)
+  loginCount      Int                      @default(0)
+  lastLoginAt     DateTime?
+  createdAt       DateTime                 @default(now())
+  updatedAt       DateTime                 @updatedAt
+  homeworkItems   HomeworkItem[]
+  statusOverrides HomeworkStatusOverride[]
+  oauthAccounts   OAuthAccount[]
+  analyticsEvents AnalyticsEvent[]
+}
+
+model OAuthAccount {
+  id                String   @id @default(cuid())
+  userId            String
+  provider          String
+  providerAccountId String
+  scopes            String?
+  tokenExpiresAt    DateTime?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@index([userId])
+}
+
+model HomeworkItem {
+  id             String                   @id
+  userId         String
+  sourceId       String
+  source         String                   @default("demo")
+  title          String
+  subject        String
+  teacher        String?
+  description    String?
+  dueAt          DateTime?
+  classroomUrl   String?
+  classroomState String?
+  status         String                   @default("NEW")
+  createdAt      DateTime                 @default(now())
+  updatedAt      DateTime                 @updatedAt
+  user           User                     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  overrides      HomeworkStatusOverride[]
+
+  @@unique([userId, sourceId])
+  @@index([userId, dueAt])
+}
+
+model HomeworkStatusOverride {
+  id             String       @id @default(cuid())
+  userId         String
+  homeworkItemId String
+  status         String
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  homeworkItem   HomeworkItem @relation(fields: [homeworkItemId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, homeworkItemId])
+  @@index([homeworkItemId])
+}
+
+model LearningLink {
+  id          String   @id
+  title       String
+  description String
+  url         String
+  icon        String
+  category    String
+  colour      String
+  sortOrder   Int      @default(0)
+  enabled     Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model SchoolNotice {
+  id        String   @id
+  title     String
+  body      String
+  audience  String
+  labelDate String
+  pinned    Boolean  @default(false)
+  startsAt  DateTime?
+  endsAt    DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model SchoolNewsItem {
+  id        String   @id
+  title     String
+  excerpt   String
+  category  String
+  labelDate String
+  accent    String
+  url       String?
+  published Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model TimetableEntry {
+  id        String   @id
+  userId    String?
+  day       String
+  lesson    String
+  subject   String
+  teacher   String
+  room      String
+  startTime String
+  endTime   String
+  colour    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId, day])
+}
+
+model House {
+  id        String             @id
+  name      String             @unique
+  colour    String
+  points    Int                @default(0)
+  createdAt DateTime           @default(now())
+  updatedAt DateTime           @updatedAt
+  changes   HousePointChange[]
+}
+
+model HousePointChange {
+  id             String   @id @default(cuid())
+  houseId        String
+  previousPoints Int
+  newPoints      Int
+  delta          Int
+  reason         String?
+  actorEmail     String
+  createdAt      DateTime @default(now())
+  house          House    @relation(fields: [houseId], references: [id], onDelete: Cascade)
+
+  @@index([houseId, createdAt])
+}
+
+model AnalyticsEvent {
+  id          String   @id @default(cuid())
+  userId      String?
+  eventType   String
+  targetId    String?
+  targetLabel String?
+  path        String?
+  createdAt   DateTime @default(now())
+  user        User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([eventType, createdAt])
+  @@index([targetId, createdAt])
+  @@index([userId, createdAt])
+}
+
+model AdminAuditLog {
+  id         String   @id @default(cuid())
+  actorEmail String
+  action     String
+  targetType String
+  targetId   String
+  beforeJson String?
+  afterJson  String?
+  createdAt  DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([actorEmail, createdAt])
+}

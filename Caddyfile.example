@@ -1,0 +1,18 @@
+dh.gs-net.co.uk {
+	encode zstd gzip
+
+	handle /grafana/* {
+		reverse_proxy dixie-hub-grafana:3000
+	}
+
+	handle {
+		reverse_proxy dixie-hub:3000
+	}
+
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		X-Content-Type-Options "nosniff"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		Permissions-Policy "camera=(), microphone=(), geolocation=()"
+	}
+}

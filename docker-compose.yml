@@ -1,0 +1,84 @@
+services:
+  dixie-hub:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: dixie-hub
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: file:/app/data/dixie-hub.db
+      NEXTAUTH_URL: https://dh.gs-net.co.uk
+    volumes:
+      - ./data:/app/data
+    expose:
+      - "3000"
+    networks:
+      - caddy
+
+  prometheus:
+    image: prom/prometheus:v3.12.0
+    container_name: dixie-hub-prometheus
+    restart: unless-stopped
+    env_file:
+      - .env
+    entrypoint: /bin/sh
+    command:
+      - -c
+      - >
+        sed "s|__METRICS_TOKEN__|$${METRICS_BEARER_TOKEN}|g"
+        /etc/prometheus/prometheus.template.yml
+        > /tmp/prometheus.yml
+        && /bin/prometheus
+        --config.file=/tmp/prometheus.yml
+        --storage.tsdb.path=/prometheus
+        --storage.tsdb.retention.time=180d
+    volumes:
+      - ./monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.template.yml:ro
+      - prometheus-data:/prometheus
+    depends_on:
+      dixie-hub:
+        condition: service_healthy
+    expose:
+      - "9090"
+    networks:
+      - caddy
+
+  grafana:
+    image: grafana/grafana:13.0.2
+    container_name: dixie-hub-grafana
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      GF_SERVER_ROOT_URL: https://dh.gs-net.co.uk/grafana/
+      GF_SERVER_SERVE_FROM_SUB_PATH: "true"
+      GF_SECURITY_ADMIN_USER: ${GRAFANA_ADMIN_USER:-dixie-admin}
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD}
+      GF_SECURITY_COOKIE_SECURE: "true"
+      GF_SECURITY_COOKIE_SAMESITE: lax
+      GF_SECURITY_ALLOW_EMBEDDING: "true"
+      GF_AUTH_ANONYMOUS_ENABLED: "false"
+      GF_USERS_ALLOW_SIGN_UP: "false"
+      GF_ANALYTICS_REPORTING_ENABLED: "false"
+      GF_ANALYTICS_CHECK_FOR_UPDATES: "false"
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./monitoring/grafana/dashboards:/var/lib/grafana/dashboards:ro
+    depends_on:
+      - prometheus
+    expose:
+      - "3000"
+    networks:
+      - caddy
+
+networks:
+  caddy:
+    external: true
+    name: ${CADDY_NETWORK:-caddy}
+
+volumes:
+  prometheus-data:
+  grafana-data:
