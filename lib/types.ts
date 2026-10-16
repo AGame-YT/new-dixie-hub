@@ -69,3 +69,35 @@ export type NewsItem = {
   category: string;
   accent: string;
 };
+
+export type SubjectLinkItem = {
+  id: string;
+  subject: string;
+  icon: string;
+  colour: string;
+  driveUrl: string;
+  classroomUrl: string;
+};
+
+export type StaffLinkItem = {
+  id: string;
+  title: string;
+  description: string;
+  url: string;
+  icon: string;
+  colour: string;
+};
+
+export const moodLevels = [1, 2, 3, 4, 5] as const;
+export type MoodLevel = (typeof moodLevels)[number];
+
+export type WellbeingCheckInItem = {
+  id: string;
+  studentName: string;
+  formGroup: string;
+  section: string;
+  mood: MoodLevel;
+  note?: string;
+  createdAt: string;
+  acknowledged: boolean;
+};

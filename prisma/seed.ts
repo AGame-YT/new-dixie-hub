@@ -97,6 +97,35 @@ async function main() {
     });
   }
 
+  // Demo pastoral routing for "How are you feeling?" check-ins.
+  const sections = [
+    { section: "Middle School", headEmail: "head.middle@dixie.example" },
+    { section: "Senior School", headEmail: "head.senior@dixie.example" }
+  ];
+  for (const section of sections) {
+    await prisma.pastoralSection.upsert({
+      where: { section: section.section },
+      update: section,
+      create: section
+    });
+  }
+  const groups = [
+    { formGroup: "9D", section: "Middle School", tutorEmail: "mr.shah@dixie.example" },
+    { formGroup: "11B", section: "Senior School", tutorEmail: "mrs.bennett@dixie.example" }
+  ];
+  for (const group of groups) {
+    await prisma.pastoralGroup.upsert({
+      where: { formGroup: group.formGroup },
+      update: group,
+      create: group
+    });
+  }
+  await prisma.pastoralProfile.upsert({
+    where: { email: demoUser.email },
+    update: { formGroup: "11B" },
+    create: { email: demoUser.email, formGroup: "11B" }
+  });
+
   for (const entry of demoTimetable) {
     await prisma.timetableEntry.upsert({
       where: { id: entry.id },

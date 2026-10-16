@@ -1,7 +1,9 @@
+import { subjectStyle } from "@/lib/config";
 import type {
   EmailSummaryItem,
   HomeworkItem,
-  TimetableItem
+  TimetableItem,
+  WellbeingCheckInItem
 } from "@/lib/types";
 
 const isoAt = (daysFromNow: number, hour = 16) => {
@@ -123,126 +125,103 @@ export const demoEmails: EmailSummaryItem[] = [
   }
 ];
 
-export const demoTimetable: TimetableItem[] = [
+const periods = [
+  { lesson: "Period 1", startTime: "08:45", endTime: "09:45" },
+  { lesson: "Period 2", startTime: "09:50", endTime: "10:50" },
+  { lesson: "Period 3", startTime: "11:10", endTime: "12:10" },
+  { lesson: "Period 4", startTime: "13:10", endTime: "14:10" },
+  { lesson: "Period 5", startTime: "14:15", endTime: "15:15" }
+];
+
+const lessons: Record<string, [string, string, string]> = {
+  english: ["English Literature", "Mrs Bennett", "S12"],
+  maths: ["Mathematics", "Mr Shah", "M4"],
+  chemistry: ["Chemistry", "Dr Palmer", "Lab 2"],
+  biology: ["Biology", "Mrs Lewis", "Lab 1"],
+  physics: ["Physics", "Mr Okafor", "Lab 3"],
+  history: ["History", "Mr Clarke", "H7"],
+  geography: ["Geography", "Mr Evans", "G6"],
+  french: ["French", "Mme Laurent", "L3"],
+  art: ["Art", "Ms Hughes", "Art 1"],
+  computing: ["Computing", "Mr Doyle", "IT2"],
+  games: ["Games", "Miss Wright", "Sports Hall"]
+};
+
+const week: Record<string, string[]> = {
+  Monday: ["english", "maths", "chemistry", "history", "games"],
+  Tuesday: ["french", "biology", "maths", "geography", "art"],
+  Wednesday: ["geography", "physics", "english", "computing", "maths"],
+  Thursday: ["english", "history", "french", "chemistry", "physics"],
+  Friday: ["chemistry", "maths", "biology", "art", "games"]
+};
+
+function buildTimetable(
+  plan: Record<string, string[]>,
+  describe: (key: string) => { subject: string; teacher: string; room: string }
+): TimetableItem[] {
+  return Object.entries(plan).flatMap(([day, keys]) =>
+    keys.map((key, index) => {
+      const lesson = describe(key);
+      return {
+        id: `${day.slice(0, 3).toLowerCase()}-${index + 1}`,
+        day,
+        ...periods[index],
+        ...lesson,
+        colour: subjectStyle(lesson.subject).colour
+      };
+    })
+  );
+}
+
+export const demoTimetable: TimetableItem[] = buildTimetable(week, (key) => {
+  const [subject, teacher, room] = lessons[key];
+  return { subject, teacher, room };
+});
+
+/** A teacher's week: class codes stand in for the teacher name. */
+export const demoTeacherTimetable: TimetableItem[] = buildTimetable(
   {
-    id: "mon-1",
-    day: "Monday",
-    lesson: "Period 1",
-    subject: "English Literature",
-    teacher: "Mrs Bennett",
-    room: "S12",
-    startTime: "08:45",
-    endTime: "09:45",
-    colour: "plum"
+    Monday: ["11B Maths", "Free", "10A Maths", "Form 9D", "13M Further Maths"],
+    Tuesday: ["9C Maths", "11B Maths", "Free", "12M Maths", "10A Maths"],
+    Wednesday: ["Free", "13M Further Maths", "9C Maths", "11B Maths", "Duty"],
+    Thursday: ["10A Maths", "12M Maths", "Form 9D", "Free", "9C Maths"],
+    Friday: ["11B Maths", "Free", "13M Further Maths", "12M Maths", "Briefing"]
+  },
+  (key) => ({
+    subject: key,
+    teacher: key === "Free" || key === "Duty" || key === "Briefing" ? "" : "Mr Shah",
+    room: key === "Duty" ? "Lunch hall" : key === "Free" ? "—" : "M4"
+  })
+);
+
+export const demoCheckIns: WellbeingCheckInItem[] = [
+  {
+    id: "checkin-1",
+    studentName: "Sam Patel",
+    formGroup: "9D",
+    section: "Middle School",
+    mood: 2,
+    note: "Feeling a bit overwhelmed with deadlines this week.",
+    createdAt: isoAt(0, 8),
+    acknowledged: false
   },
   {
-    id: "mon-2",
-    day: "Monday",
-    lesson: "Period 2",
-    subject: "Mathematics",
-    teacher: "Mr Shah",
-    room: "M4",
-    startTime: "09:50",
-    endTime: "10:50",
-    colour: "blue"
+    id: "checkin-2",
+    studentName: "Ella Hughes",
+    formGroup: "9D",
+    section: "Middle School",
+    mood: 4,
+    createdAt: isoAt(0, 8),
+    acknowledged: false
   },
   {
-    id: "mon-3",
-    day: "Monday",
-    lesson: "Period 3",
-    subject: "Chemistry",
-    teacher: "Dr Palmer",
-    room: "Lab 2",
-    startTime: "11:10",
-    endTime: "12:10",
-    colour: "green"
-  },
-  {
-    id: "mon-4",
-    day: "Monday",
-    lesson: "Period 4",
-    subject: "History",
-    teacher: "Mr Clarke",
-    room: "H7",
-    startTime: "13:10",
-    endTime: "14:10",
-    colour: "amber"
-  },
-  {
-    id: "mon-5",
-    day: "Monday",
-    lesson: "Period 5",
-    subject: "Games",
-    teacher: "Miss Wright",
-    room: "Sports Hall",
-    startTime: "14:15",
-    endTime: "15:30",
-    colour: "red"
-  },
-  {
-    id: "tue-1",
-    day: "Tuesday",
-    lesson: "Period 1",
-    subject: "French",
-    teacher: "Mme Laurent",
-    room: "L3",
-    startTime: "08:45",
-    endTime: "09:45",
-    colour: "violet"
-  },
-  {
-    id: "tue-2",
-    day: "Tuesday",
-    lesson: "Period 2",
-    subject: "Biology",
-    teacher: "Mrs Lewis",
-    room: "Lab 1",
-    startTime: "09:50",
-    endTime: "10:50",
-    colour: "green"
-  },
-  {
-    id: "tue-3",
-    day: "Tuesday",
-    lesson: "Period 3",
-    subject: "Mathematics",
-    teacher: "Mr Shah",
-    room: "M4",
-    startTime: "11:10",
-    endTime: "12:10",
-    colour: "blue"
-  },
-  {
-    id: "wed-1",
-    day: "Wednesday",
-    lesson: "Period 1",
-    subject: "Geography",
-    teacher: "Mr Evans",
-    room: "G6",
-    startTime: "08:45",
-    endTime: "09:45",
-    colour: "cyan"
-  },
-  {
-    id: "thu-1",
-    day: "Thursday",
-    lesson: "Period 1",
-    subject: "English Literature",
-    teacher: "Mrs Bennett",
-    room: "S12",
-    startTime: "08:45",
-    endTime: "09:45",
-    colour: "plum"
-  },
-  {
-    id: "fri-1",
-    day: "Friday",
-    lesson: "Period 1",
-    subject: "Chemistry",
-    teacher: "Dr Palmer",
-    room: "Lab 2",
-    startTime: "08:45",
-    endTime: "09:45",
-    colour: "green"
+    id: "checkin-3",
+    studentName: "Noah Williams",
+    formGroup: "9D",
+    section: "Middle School",
+    mood: 1,
+    note: "Can I talk to someone today please?",
+    createdAt: isoAt(-1, 13),
+    acknowledged: true
   }
 ];

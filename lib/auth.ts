@@ -2,7 +2,7 @@ import type { NextAuthOptions } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { timingSafeEqual } from "node:crypto";
-import { isAdminEmail } from "@/lib/access";
+import { isAdminEmail, isStaffEmail } from "@/lib/access";
 import { analyticsTypes, recordAnalyticsEvent } from "@/lib/analytics";
 import { prisma } from "@/lib/prisma";
 
@@ -179,7 +179,8 @@ export const authOptions: NextAuthOptions = {
           sub: user?.id ?? "local-admin",
           name: user?.name ?? "Dixie Hub Administrator",
           email: user?.email,
-          isAdmin: true
+          isAdmin: true,
+          isStaff: true
         };
       }
 
@@ -253,7 +254,8 @@ export const authOptions: NextAuthOptions = {
           accessTokenExpires: account.expires_at
             ? account.expires_at * 1000
             : Date.now() + 3600 * 1000,
-          isAdmin: isAdminEmail(email)
+          isAdmin: isAdminEmail(email),
+          isStaff: isStaffEmail(email)
         };
       }
 
@@ -277,6 +279,7 @@ export const authOptions: NextAuthOptions = {
       }
       session.authError = token.authError;
       session.isAdmin = Boolean(token.isAdmin);
+      session.isStaff = Boolean(token.isStaff) || isStaffEmail(token.email);
       return session;
     }
   },

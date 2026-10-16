@@ -26,6 +26,13 @@ export default function PrivacyPage() {
           Local Kanban status overrides may be stored so a student can mark work as
           in progress without changing its Google Classroom submission state.
         </p>
+        <h2>Wellbeing check-ins</h2>
+        <p>
+          If a student answers &ldquo;How are you feeling?&rdquo;, their answer and any
+          note are stored and shown only to their form tutor and head of section.
+          Check-ins are not monitored around the clock: anyone who needs help
+          urgently should speak to a member of staff.
+        </p>
         <h2>Usage analytics</h2>
         <p>
           The hub records a small set of first-party operational events: successful

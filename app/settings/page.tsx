@@ -17,7 +17,13 @@ export default async function SettingsPage({
   const demo = params.demo === "1" || !session?.user;
 
   return (
-    <AppShell user={session?.user} demo={demo} isAdmin={session?.isAdmin}>
+    <AppShell
+      user={session?.user}
+      demo={demo}
+      isAdmin={session?.isAdmin}
+      isStaff={session?.isStaff}
+      media={false}
+    >
       <div className="page-heading">
         <div>
           <span className="eyebrow">Make it yours</span>

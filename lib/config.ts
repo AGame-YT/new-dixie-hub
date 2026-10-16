@@ -1,4 +1,10 @@
-import type { LearningLinkItem, NewsItem, NoticeItem } from "@/lib/types";
+import type {
+  LearningLinkItem,
+  NewsItem,
+  NoticeItem,
+  StaffLinkItem,
+  SubjectLinkItem
+} from "@/lib/types";
 
 export const schoolConfig = {
   name: "The Dixie Grammar School",
@@ -219,3 +225,163 @@ export const schoolNews: NewsItem[] = [
     accent: "blue"
   }
 ];
+
+/**
+ * The eight icon tiles at the top of the hub (4 × 2). Order matters.
+ * Everything else in `learningLinks` appears in the "All links" section.
+ */
+export const quickLinkIds = [
+  "classroom",
+  "gmail",
+  "drive",
+  "calendar",
+  "sparx",
+  "seneca",
+  "library",
+  "wellbeing"
+] as const;
+
+/**
+ * Per-subject shortcuts at the bottom of the hub. Replace the placeholder
+ * URLs with each department's shared Drive folder and Classroom class link.
+ * Every department folder should follow `driveLayoutStandard` below.
+ */
+export const subjectLinks: SubjectLinkItem[] = [
+  { id: "english", subject: "English", icon: "english", colour: "purple" },
+  { id: "maths", subject: "Maths", icon: "maths", colour: "blue" },
+  { id: "biology", subject: "Biology", icon: "biology", colour: "green" },
+  { id: "chemistry", subject: "Chemistry", icon: "chemistry", colour: "teal" },
+  { id: "physics", subject: "Physics", icon: "physics", colour: "navy" },
+  { id: "history", subject: "History", icon: "history", colour: "amber" },
+  { id: "geography", subject: "Geography", icon: "geography", colour: "cyan" },
+  { id: "languages", subject: "Languages", icon: "languages", colour: "pink" },
+  { id: "art", subject: "Art", icon: "art", colour: "orange" },
+  { id: "music", subject: "Music", icon: "music", colour: "violet" },
+  { id: "drama", subject: "Drama", icon: "drama", colour: "rose" },
+  { id: "pe", subject: "PE & Games", icon: "pe", colour: "red" },
+  { id: "computing", subject: "Computing", icon: "computing", colour: "lime" }
+].map((subject) => ({
+  ...subject,
+  driveUrl: "https://drive.google.com",
+  classroomUrl: "https://classroom.google.com"
+}));
+
+const subjectAliases: [RegExp, string][] = [
+  [/math/, "maths"],
+  [/(french|german|spanish|latin|language)/, "languages"],
+  [/(games|sport|\bpe\b)/, "pe"],
+  [/(computer|computing|\bict\b)/, "computing"]
+];
+
+/** Maps timetable / Classroom subject names onto a subject icon and colour. */
+export function subjectStyle(subject: string) {
+  const name = subject.toLowerCase();
+  const aliasId = subjectAliases.find(([pattern]) => pattern.test(name))?.[1];
+  const match =
+    subjectLinks.find((item) => item.id === aliasId) ??
+    subjectLinks.find(
+      (item) => name.includes(item.id) || name.includes(item.subject.toLowerCase())
+    );
+  return {
+    icon: match?.icon ?? "book",
+    colour: match?.colour ?? "slate"
+  };
+}
+
+/**
+ * The folder structure every department is asked to use in its shared
+ * student Drive, so students always know where to look.
+ */
+export const driveLayoutStandard = [
+  { folder: "01 Course information", hint: "Specification, course outline, key dates" },
+  { folder: "02 Lessons", hint: "One folder per topic, slides and handouts" },
+  { folder: "03 Homework", hint: "Task sheets and resources, by half term" },
+  { folder: "04 Revision", hint: "Knowledge organisers, past papers, mark schemes" },
+  { folder: "05 Assessments", hint: "Assessment guidance and feedback" },
+  { folder: "06 Extension & enrichment", hint: "Wider reading and challenge tasks" }
+];
+
+/** Teacher view shortcuts. Replace the placeholder URLs with the real documents. */
+export const staffLinks: StaffLinkItem[] = [
+  {
+    id: "briefing-notes",
+    title: "Briefing notes",
+    description: "This week's staff briefing",
+    url: "https://drive.google.com",
+    icon: "briefing",
+    colour: "navy"
+  },
+  {
+    id: "cover",
+    title: "Cover & rooming",
+    description: "Today's cover and room changes",
+    url: "https://drive.google.com",
+    icon: "users",
+    colour: "amber"
+  },
+  {
+    id: "staff-calendar",
+    title: "Staff calendar",
+    description: "Meetings, duties and events",
+    url: "https://calendar.google.com",
+    icon: "calendar",
+    colour: "purple"
+  },
+  {
+    id: "safeguarding",
+    title: "Safeguarding",
+    description: "Report a concern to the DSL",
+    url: "https://www.dixie.org.uk",
+    icon: "shield",
+    colour: "red"
+  },
+  {
+    id: "classroom",
+    title: "Google Classroom",
+    description: "Your classes",
+    url: "https://classroom.google.com",
+    icon: "classroom",
+    colour: "green"
+  },
+  {
+    id: "staff-drive",
+    title: "Staff shared drive",
+    description: "Policies, templates and planning",
+    url: "https://drive.google.com",
+    icon: "drive",
+    colour: "blue"
+  },
+  {
+    id: "gmail",
+    title: "Gmail",
+    description: "School inbox",
+    url: "https://mail.google.com",
+    icon: "mail",
+    colour: "rose"
+  },
+  {
+    id: "it-help",
+    title: "IT helpdesk",
+    description: "Report a problem",
+    url: "mailto:itsupport@dixie.org.uk",
+    icon: "help",
+    colour: "cyan"
+  }
+];
+
+/**
+ * Side panel media. Set NEXT_PUBLIC_SCHOOL_VIDEO_URL to a looping MP4/WebM
+ * (for example the clip used on the school website's homepage). Without it
+ * the panel cross-fades through these school photographs.
+ */
+export const schoolMedia = {
+  videoUrl: process.env.NEXT_PUBLIC_SCHOOL_VIDEO_URL ?? "",
+  posterUrl: "/brand/respect.jpg",
+  photos: [
+    { src: "/brand/respect.jpg", caption: "Respect" },
+    { src: "/brand/resilience.jpg", caption: "Resilience" },
+    { src: "/brand/courage.jpg", caption: "Courage" },
+    { src: "/brand/commitment.jpg", caption: "Commitment" },
+    { src: "/brand/care.jpg", caption: "Care" }
+  ]
+};

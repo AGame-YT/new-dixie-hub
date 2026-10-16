@@ -7,6 +7,7 @@ declare module "next-auth" {
     } & DefaultSession["user"];
     authError?: string;
     isAdmin?: boolean;
+    isStaff?: boolean;
   }
 }
 
@@ -17,5 +18,6 @@ declare module "next-auth/jwt" {
     accessTokenExpires?: number;
     authError?: string;
     isAdmin?: boolean;
+    isStaff?: boolean;
   }
 }

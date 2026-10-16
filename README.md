@@ -7,8 +7,16 @@ The first release is designed for a single Google-authenticated student. It uses
 ## What is included
 
 - Public hub page with school links, news, notices and Google sign-in
-- Personalised dashboard with student name/avatar and today’s overview
-- Drag-and-drop homework Kanban board with local status overrides
+- One-page student hub: greeting, eight quick links (4 × 2), timetable, homework,
+  news, notices, per-subject Drive/Classroom links and all other links at the bottom
+- Blue-and-gold design with Londrina Solid headings, Lucide icons, a leopard-print
+  accent and an ePraise-style bright palette (`app/hub.css`)
+- Side panel of school pictures, or a looping video via `NEXT_PUBLIC_SCHOOL_VIDEO_URL`
+- Homework to-do list with check-off, plus an optional drag-and-drop Kanban view
+- Private "How are you feeling?" check-ins, routed to the student's form tutor and
+  head of section (`PastoralProfile` / `PastoralGroup` / `PastoralSection` tables)
+- Teacher view (`/teacher`): timetable, check-ins, notices, briefing notes and the
+  standard student Drive layout. Access via `STAFF_GOOGLE_EMAILS` / `STAFF_GOOGLE_DOMAIN`
 - Google Classroom read-only service and sync endpoint
 - Gmail metadata-only unread email summary service
 - Daily and weekly timetable UI with demo provider

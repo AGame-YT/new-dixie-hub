@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { Icon } from "@/components/Icon";
 import {
   homeworkStatuses,
@@ -8,7 +8,7 @@ import {
   type HomeworkStatus
 } from "@/lib/types";
 
-const columnMeta: Record<
+export const columnMeta: Record<
   HomeworkStatus,
   { title: string; tone: string; description: string }
 > = {
@@ -31,7 +31,7 @@ const columnMeta: Record<
   }
 };
 
-const priorityLabels: Record<HomeworkItem["priority"], string> = {
+export const priorityLabels: Record<HomeworkItem["priority"], string> = {
   overdue: "Overdue",
   today: "Due today",
   tomorrow: "Due tomorrow",
@@ -40,63 +40,40 @@ const priorityLabels: Record<HomeworkItem["priority"], string> = {
   none: "No due date"
 };
 
-function formatDueDate(value?: string) {
+const shortDays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+const shortMonths = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+// Formatted by hand (in UK time) so server and browser render identical text.
+export function formatDueDate(value?: string) {
   if (!value) return "No due date";
-  return new Date(value).toLocaleDateString("en-GB", {
-    weekday: "short",
-    day: "numeric",
-    month: "short"
-  });
+  const parts = Object.fromEntries(
+    new Intl.DateTimeFormat("en-GB", {
+      timeZone: "Europe/London",
+      year: "numeric",
+      month: "numeric",
+      day: "numeric"
+    })
+      .formatToParts(new Date(value))
+      .map((part) => [part.type, Number(part.value)])
+  );
+  const date = new Date(Date.UTC(parts.year, parts.month - 1, parts.day));
+  return `${shortDays[date.getUTCDay()]} ${parts.day} ${shortMonths[parts.month - 1]}`;
 }
 
 export function HomeworkBoard({
-  initialItems,
-  demo = false,
-  compact = false
+  items,
+  onMove,
+  savedId
 }: {
-  initialItems: HomeworkItem[];
-  demo?: boolean;
-  compact?: boolean;
+  items: HomeworkItem[];
+  onMove: (id: string, status: HomeworkStatus) => void;
+  savedId?: string | null;
 }) {
-  const [items, setItems] = useState(initialItems);
   const [search, setSearch] = useState("");
   const [subject, setSubject] = useState("All subjects");
   const [due, setDue] = useState("All dates");
   const [draggedId, setDraggedId] = useState<string | null>(null);
-  const [savedId, setSavedId] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (!demo) return;
-    const stored = localStorage.getItem("dixie-homework-overrides");
-    if (!stored) return;
-    try {
-      const overrides = JSON.parse(stored) as Record<string, HomeworkStatus>;
-      setItems((current) =>
-        current.map((item) => ({
-          ...item,
-          status: overrides[item.id] ?? item.status
-        }))
-      );
-    } catch {
-      localStorage.removeItem("dixie-homework-overrides");
-    }
-  }, [demo]);
-
-  useEffect(() => {
-    if (demo) return;
-    let cancelled = false;
-    fetch("/api/classroom")
-      .then((response) => (response.ok ? response.json() : null))
-      .then((data: { items?: HomeworkItem[] } | null) => {
-        if (!cancelled && data?.items?.length) {
-          setItems(data.items);
-        }
-      })
-      .catch(() => undefined);
-    return () => {
-      cancelled = true;
-    };
-  }, [demo]);
+  const moveItem = onMove;
 
   const subjects = useMemo(
     () => [
@@ -126,83 +103,49 @@ export function HomeworkBoard({
     });
   }, [due, items, search, subject]);
 
-  async function moveItem(id: string, status: HomeworkStatus) {
-    setItems((current) =>
-      current.map((item) => (item.id === id ? { ...item, status } : item))
-    );
-    setSavedId(id);
-    window.setTimeout(() => setSavedId(null), 1200);
-
-    if (demo) {
-      const current = JSON.parse(
-        localStorage.getItem("dixie-homework-overrides") ?? "{}"
-      ) as Record<string, HomeworkStatus>;
-      localStorage.setItem(
-        "dixie-homework-overrides",
-        JSON.stringify({ ...current, [id]: status })
-      );
-    }
-
-    try {
-      await fetch(`/api/homework/${encodeURIComponent(id)}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status, demo })
-      });
-    } catch {
-      // The optimistic move remains available locally if the API is offline.
-    }
-  }
-
-  const visibleStatuses = compact
-    ? homeworkStatuses.slice(0, 3)
-    : homeworkStatuses;
-
   return (
-    <div className={compact ? "homework-board compact" : "homework-board"}>
-      {!compact && (
-        <div className="board-toolbar">
-          <label className="search-field">
-            <Icon name="search" size={18} />
-            <input
-              value={search}
-              onChange={(event) => setSearch(event.target.value)}
-              placeholder="Search homework"
-              aria-label="Search homework"
-            />
+    <div className="homework-board">
+      <div className="board-toolbar">
+        <label className="search-field">
+          <Icon name="search" size={18} />
+          <input
+            value={search}
+            onChange={(event) => setSearch(event.target.value)}
+            placeholder="Search homework"
+            aria-label="Search homework"
+          />
+        </label>
+        <div className="filter-group">
+          <label>
+            <span className="sr-only">Filter by subject</span>
+            <select
+              value={subject}
+              onChange={(event) => setSubject(event.target.value)}
+            >
+              {subjects.map((option) => (
+                <option key={option}>{option}</option>
+              ))}
+            </select>
           </label>
-          <div className="filter-group">
-            <label>
-              <span className="sr-only">Filter by subject</span>
-              <select
-                value={subject}
-                onChange={(event) => setSubject(event.target.value)}
-              >
-                {subjects.map((option) => (
-                  <option key={option}>{option}</option>
-                ))}
-              </select>
-            </label>
-            <label>
-              <span className="sr-only">Filter by due date</span>
-              <select
-                value={due}
-                onChange={(event) => setDue(event.target.value)}
-              >
-                <option>All dates</option>
-                <option>Urgent</option>
-                <option>This week</option>
-                <option>Later</option>
-              </select>
-            </label>
-            <span className="result-count">{filtered.length} items</span>
-          </div>
+          <label>
+            <span className="sr-only">Filter by due date</span>
+            <select
+              value={due}
+              onChange={(event) => setDue(event.target.value)}
+            >
+              <option>All dates</option>
+              <option>Urgent</option>
+              <option>This week</option>
+              <option>Later</option>
+            </select>
+          </label>
+          <span className="result-count">{filtered.length} items</span>
         </div>
-      )}
+      </div>
 
       <div className="kanban-scroll">
         <div className="kanban-grid">
-          {visibleStatuses.map((status) => {
+          {homeworkStatuses.map((status) => {
             const meta = columnMeta[status];
             const columnItems = filtered.filter((item) => item.status === status);
             return (

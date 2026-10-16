@@ -1,6 +1,9 @@
-@import url("https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400..800;1,400..800&family=Raleway:ital,wght@0,100..900;1,100..900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=EB+Garamond:wght@600&family=Londrina+Solid:wght@300;400;900&family=Raleway:ital,wght@0,400..800;1,400..800&display=swap");
 
 :root {
+  --font-display: "Londrina Solid", "Arial Rounded MT Bold", "Trebuchet MS", sans-serif;
+  --font-body: "Raleway", Arial, Helvetica, sans-serif;
+  --font-brand: "EB Garamond", "Times New Roman", serif;
   --ink: #0f336f;
   --ink-soft: #53677f;
   --navy: #0f336f;
@@ -50,7 +53,7 @@ body {
   margin: 0;
   color: var(--ink);
   background: var(--surface);
-  font-family: "Raleway", Arial, Helvetica, sans-serif;
+  font-family: var(--font-body);
   -webkit-font-smoothing: antialiased;
 }
 
@@ -83,7 +86,7 @@ h1,
 h2,
 h3,
 h4 {
-  font-family: "EB Garamond", "Times New Roman", Times, serif;
+  font-family: var(--font-display);
 }
 
 .sr-only {
@@ -132,7 +135,7 @@ h4 {
 }
 
 .brand-copy strong {
-  font-family: "EB Garamond", "Times New Roman", serif;
+  font-family: var(--font-brand);
   font-size: 22px;
   font-weight: 600;
   letter-spacing: 0;
@@ -371,10 +374,10 @@ h4 {
 .hero h1 {
   margin-bottom: 23px;
   color: white;
-  font-family: "EB Garamond", "Times New Roman", serif;
+  font-family: var(--font-display);
   font-size: clamp(47px, 5vw, 72px);
-  font-weight: 500;
-  letter-spacing: -0.052em;
+  font-weight: 400;
+  letter-spacing: 0;
   line-height: 0.99;
 }
 
@@ -513,7 +516,7 @@ h4 {
 
 .mock-greeting strong {
   margin-top: 5px;
-  font-family: "EB Garamond", "Times New Roman", serif;
+  font-family: var(--font-display);
   font-size: 21px;
 }
 
@@ -547,7 +550,7 @@ h4 {
 }
 
 .mock-stats b {
-  font-family: "EB Garamond", "Times New Roman", serif;
+  font-family: var(--font-display);
   font-size: 20px;
 }
 
@@ -696,9 +699,9 @@ h4 {
 .section-heading h2 {
   margin: 0;
   color: var(--navy);
-  font-family: "EB Garamond", "Times New Roman", serif;
+  font-family: var(--font-display);
   font-size: 34px;
-  font-weight: 500;
+  font-weight: 400;
   letter-spacing: 0;
 }
 
@@ -824,9 +827,9 @@ h4 {
 }
 .news-card h3, .notice-card h3 {
   margin: 7px 0 5px;
-  font-family: "EB Garamond", "Times New Roman", serif;
+  font-family: var(--font-display);
   font-size: 17px;
-  font-weight: 600;
+  font-weight: 400;
 }
 .news-card p, .notice-card p {
   margin: 0;
@@ -971,7 +974,7 @@ h4 {
 
 .sidebar-houses .house-scoreboard-heading h2 {
   color: white;
-  font-family: "Raleway", Arial, sans-serif;
+  font-family: var(--font-body);
   font-size: 10px;
   font-weight: 750;
   letter-spacing: 0.08em;
@@ -1021,7 +1024,7 @@ h4 {
 
 .sidebar-houses .house-score-copy strong {
   color: white;
-  font-family: "Raleway", Arial, sans-serif;
+  font-family: var(--font-body);
   font-size: 8px;
 }
 
@@ -1220,10 +1223,10 @@ h4 {
 .page-heading h1,
 .legal-page h1 {
   margin: 0;
-  font-family: "EB Garamond", "Times New Roman", serif;
+  font-family: var(--font-display);
   font-size: 35px;
-  font-weight: 550;
-  letter-spacing: -0.035em;
+  font-weight: 400;
+  letter-spacing: 0;
 }
 
 .welcome-row p,
@@ -1302,7 +1305,7 @@ h4 {
 }
 
 .stat-card b {
-  font-family: "EB Garamond", "Times New Roman", serif;
+  font-family: var(--font-display);
   font-size: 23px;
   line-height: 1;
 }
@@ -1880,9 +1883,9 @@ h4 {
 .house-scoreboard-heading h2 {
   margin: 0;
   color: var(--navy);
-  font-family: "EB Garamond", "Times New Roman", serif;
+  font-family: var(--font-display);
   font-size: 27px;
-  font-weight: 550;
+  font-weight: 400;
 }
 
 .house-scoreboard-heading p {
@@ -1974,7 +1977,7 @@ h4 {
 }
 
 .house-mark strong {
-  font-family: "EB Garamond", "Times New Roman", serif;
+  font-family: var(--font-display);
   font-size: 24px;
 }
 
@@ -1994,7 +1997,7 @@ h4 {
 
 .house-score-copy strong {
   color: var(--navy);
-  font-family: "EB Garamond", "Times New Roman", serif;
+  font-family: var(--font-display);
   font-size: 18px;
 }
 
@@ -2023,14 +2026,14 @@ h4 {
   align-items: baseline;
   gap: 4px;
   color: var(--navy);
-  font-family: "EB Garamond", "Times New Roman", serif;
+  font-family: var(--font-display);
   font-size: 27px;
   white-space: nowrap;
 }
 
 .house-points small {
   color: var(--ink-soft);
-  font-family: "Raleway", Arial, sans-serif;
+  font-family: var(--font-body);
   font-size: 7px;
   font-weight: 800;
   text-transform: uppercase;
@@ -2152,9 +2155,9 @@ h4 {
 
 .account-card h2 {
   margin: 0 0 5px;
-  font-family: "EB Garamond", "Times New Roman", serif;
+  font-family: var(--font-display);
   font-size: 20px;
-  font-weight: 600;
+  font-weight: 400;
 }
 
 .account-card p,
@@ -2214,9 +2217,9 @@ h4 {
 
 .settings-panel-heading h2 {
   margin: 0;
-  font-family: "EB Garamond", "Times New Roman", serif;
+  font-family: var(--font-display);
   font-size: 17px;
-  font-weight: 600;
+  font-weight: 400;
 }
 
 .settings-panel-heading p {
@@ -2370,7 +2373,7 @@ h4 {
 
 .legal-page h2 {
   margin: 27px 0 8px;
-  font-family: "EB Garamond", "Times New Roman", serif;
+  font-family: var(--font-display);
   font-size: 18px;
 }
 
@@ -2446,9 +2449,9 @@ h4 {
 
 .admin-hero h1 {
   margin: 0;
-  font-family: "EB Garamond", "Times New Roman", serif;
+  font-family: var(--font-display);
   font-size: 45px;
-  font-weight: 500;
+  font-weight: 400;
 }
 
 .admin-hero p {
@@ -2503,7 +2506,7 @@ h4 {
 
 .admin-stat-card strong {
   color: var(--navy);
-  font-family: "EB Garamond", "Times New Roman", serif;
+  font-family: var(--font-display);
   font-size: 29px;
   line-height: 1;
 }
@@ -2545,9 +2548,9 @@ h4 {
 .admin-panel-heading h2 {
   margin: 0;
   color: var(--navy);
-  font-family: "EB Garamond", "Times New Roman", serif;
+  font-family: var(--font-display);
   font-size: 25px;
-  font-weight: 550;
+  font-weight: 400;
 }
 
 .admin-panel-heading p {
@@ -2629,7 +2632,7 @@ h4 {
 
 .admin-house-card > div strong {
   color: var(--navy);
-  font-family: "EB Garamond", "Times New Roman", serif;
+  font-family: var(--font-display);
   font-size: 20px;
 }
 
@@ -2739,7 +2742,7 @@ h4 {
 
 .admin-ranking b {
   color: var(--navy);
-  font-family: "EB Garamond", "Times New Roman", serif;
+  font-family: var(--font-display);
   font-size: 18px;
 }
 
@@ -2866,9 +2869,9 @@ h4 {
 .admin-access-denied h1 {
   margin: 0;
   color: var(--navy);
-  font-family: "EB Garamond", "Times New Roman", serif;
+  font-family: var(--font-display);
   font-size: 35px;
-  font-weight: 550;
+  font-weight: 400;
 }
 
 .admin-access-denied p {
@@ -2941,9 +2944,9 @@ h4 {
 .admin-login-copy h1 {
   margin: 0;
   color: var(--navy);
-  font-family: "EB Garamond", "Times New Roman", serif;
+  font-family: var(--font-display);
   font-size: 36px;
-  font-weight: 550;
+  font-weight: 400;
   line-height: 1.1;
 }
 
@@ -3076,9 +3079,9 @@ h4 {
 .values-heading h2 {
   margin: 0;
   color: var(--navy);
-  font-family: "EB Garamond", "Times New Roman", serif;
+  font-family: var(--font-display);
   font-size: 42px;
-  font-weight: 500;
+  font-weight: 400;
   line-height: 1.1;
 }
 
@@ -3159,9 +3162,9 @@ h4 {
   display: block;
   margin-top: 17px;
   color: var(--navy);
-  font-family: "EB Garamond", "Times New Roman", serif;
+  font-family: var(--font-display);
   font-size: 23px;
-  font-weight: 600;
+  font-weight: 400;
 }
 
 .value-pillar p {
@@ -3199,7 +3202,7 @@ h4 {
 
 .values-section.compact .value-pillar strong {
   margin: 0;
-  font-family: "Raleway", Arial, Helvetica, sans-serif;
+  font-family: var(--font-body);
   font-size: 10px;
   font-weight: 750;
   letter-spacing: 0.04em;
@@ -3420,7 +3423,7 @@ h4 {
   .value-pillar strong,
   .values-section.compact .value-pillar strong {
     margin-top: 0;
-    font-family: "EB Garamond", "Times New Roman", serif;
+    font-family: var(--font-display);
     font-size: 20px;
     letter-spacing: 0;
     text-transform: none;

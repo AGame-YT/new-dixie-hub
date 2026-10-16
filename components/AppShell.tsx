@@ -6,8 +6,7 @@ import { BrandMark } from "@/components/BrandMark";
 import { Icon } from "@/components/Icon";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { AnalyticsBeacon } from "@/components/AnalyticsBeacon";
-import { schoolValues } from "@/lib/config";
-import { HouseScoreboard } from "@/components/HouseScoreboard";
+import { SchoolMediaRail } from "@/components/SchoolMediaRail";
 
 type AppShellProps = {
   children: React.ReactNode;
@@ -18,20 +17,25 @@ type AppShellProps = {
   };
   demo?: boolean;
   isAdmin?: boolean;
+  isStaff?: boolean;
+  /** Hide the school pictures panel, e.g. on admin screens. */
+  media?: boolean;
 };
 
-const navItems = [
-  { href: "/dashboard", label: "Dashboard", icon: "home" },
-  { href: "/homework", label: "Homework", icon: "homework" },
-  { href: "/links", label: "Learning links", icon: "grid" },
-  { href: "/settings", label: "Settings", icon: "settings" }
+const sectionLinks = [
+  { hash: "timetable", label: "Timetable", icon: "calendar" },
+  { hash: "homework", label: "Homework", icon: "homework" },
+  { hash: "news", label: "News & notices", icon: "notice" },
+  { hash: "links", label: "All links", icon: "grid" }
 ];
 
 export function AppShell({
   children,
   user,
   demo = false,
-  isAdmin = false
+  isAdmin = false,
+  isStaff = false,
+  media = true
 }: AppShellProps) {
   const pathname = usePathname();
   const name = user?.name ?? "Alex Morgan";
@@ -41,119 +45,92 @@ export function AppShell({
     .join("")
     .slice(0, 2)
     .toUpperCase();
+  const withDemo = (href: string) => {
+    if (!demo) return href;
+    const [path, hash] = href.split("#");
+    return `${path}?demo=1${hash ? `#${hash}` : ""}`;
+  };
+  const onDashboard = pathname === "/dashboard";
 
   return (
-    <div className="app-shell">
+    <div className="hub-shell">
       <AnalyticsBeacon />
-      <aside className="sidebar">
-        <div className="sidebar-brand">
-          <BrandMark />
-        </div>
-        <nav className="sidebar-nav" aria-label="Main navigation">
-          {navItems.map((item) => {
-            const active =
-              pathname === item.href ||
-              (item.href !== "/dashboard" && pathname.startsWith(item.href));
-            const href = demo ? `${item.href}?demo=1` : item.href;
-            return (
-              <Link
-                href={href}
-                key={item.href}
-                className={active ? "nav-link active" : "nav-link"}
-              >
-                <Icon name={item.icon} size={19} />
-                <span>{item.label}</span>
-              </Link>
-            );
-          })}
+      <header className="hub-topbar">
+        <BrandMark />
+        {demo && <span className="demo-pill">Demo</span>}
+        <nav className="hub-nav" aria-label="Main navigation">
+          <Link
+            href={withDemo("/dashboard")}
+            className={onDashboard ? "icon-button active" : "icon-button"}
+            aria-label="Home"
+            title="Home"
+          >
+            <Icon name="home" />
+          </Link>
+          {sectionLinks.map((link) => (
+            <Link
+              key={link.hash}
+              href={onDashboard ? `#${link.hash}` : withDemo(`/dashboard#${link.hash}`)}
+              className="icon-button"
+              aria-label={link.label}
+              title={link.label}
+            >
+              <Icon name={link.icon} />
+            </Link>
+          ))}
+          {(isStaff || demo) && (
+            <Link
+              href={withDemo("/teacher")}
+              className={pathname.startsWith("/teacher") ? "icon-button active" : "icon-button"}
+              aria-label="Teacher view"
+              title="Teacher view"
+            >
+              <Icon name="teacher" />
+            </Link>
+          )}
           {isAdmin && (
             <Link
               href="/admin"
-              className={pathname.startsWith("/admin") ? "nav-link active" : "nav-link"}
+              className={pathname.startsWith("/admin") ? "icon-button active" : "icon-button"}
+              aria-label="Admin"
+              title="Admin"
             >
-              <Icon name="settings" size={19} />
-              <span>Admin</span>
+              <Icon name="shield" />
             </Link>
           )}
         </nav>
-        <div className="sidebar-houses">
-          <HouseScoreboard compact />
-        </div>
-        <div className="sidebar-values">
-          <small>The Dixie values</small>
-          {schoolValues.map((value) => (
-            <span className={`value-${value.colour}`} key={value.id}>
-              <i />
-              {value.name}
-            </span>
-          ))}
-        </div>
-        <a
-          className="sidebar-support"
-          href="mailto:itsupport@dixie.org.uk"
-        >
-          <Icon name="help" size={18} />
-          <span>
-            <small>Need a hand?</small>
-            IT support
+        <div className="topbar-actions">
+          <ThemeToggle />
+          <Link
+            href={withDemo("/settings")}
+            className={pathname.startsWith("/settings") ? "icon-button active" : "icon-button"}
+            aria-label="Settings"
+            title="Settings"
+          >
+            <Icon name="settings" />
+          </Link>
+          <span className="profile-chip" title={user?.email ?? name}>
+            {user?.image || demo ? (
+              // Google controls this URL; no personal image is persisted by Dixie Hub.
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={user?.image ?? "/avatars/alex-morgan-anime.png"}
+                alt=""
+                referrerPolicy="no-referrer"
+              />
+            ) : (
+              <span className="avatar">{initials}</span>
+            )}
+            <span className="sr-only">{name}</span>
           </span>
-        </a>
-      </aside>
+        </div>
+      </header>
+      <div className="leopard-band" aria-hidden="true" />
 
-      <div className="app-main">
-        <header className="app-topbar">
-          <div className="mobile-brand">
-            <BrandMark compact />
-          </div>
-          {demo && <span className="demo-pill">Demo preview</span>}
-          <div className="topbar-actions">
-            <ThemeToggle />
-            <button
-              type="button"
-              className="icon-button notification-button"
-              aria-label="Notifications"
-            >
-              <Icon name="bell" />
-              <span />
-            </button>
-            <div className="profile-chip">
-              {user?.image || demo ? (
-                // Google controls this URL; no personal image is persisted by Dixie Hub.
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={user?.image ?? "/avatars/alex-morgan-anime.png"}
-                  alt=""
-                  referrerPolicy="no-referrer"
-                />
-              ) : (
-                <span className="avatar">{initials}</span>
-              )}
-              <span className="profile-copy">
-                <strong>{name}</strong>
-                <small>{demo ? "Year 11 · Demo" : user?.email}</small>
-              </span>
-            </div>
-          </div>
-        </header>
-        <main className="app-content">{children}</main>
+      <div className={media ? "hub-body with-media" : "hub-body"}>
+        {media && <SchoolMediaRail />}
+        <main className="hub-content">{children}</main>
       </div>
-
-      <nav className="mobile-nav" aria-label="Mobile navigation">
-        {navItems.slice(0, 4).map((item) => {
-          const active = pathname === item.href;
-          const href = demo ? `${item.href}?demo=1` : item.href;
-          return (
-            <Link
-              href={href}
-              key={item.href}
-              className={active ? "active" : ""}
-            >
-              <Icon name={item.icon} size={20} />
-              <span>{item.label.replace("Learning ", "")}</span>
-            </Link>
-          );
-        })}
-      </nav>
     </div>
   );
 }

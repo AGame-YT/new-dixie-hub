@@ -27,7 +27,7 @@ export function LearningLinksGrid({
     );
   }, [category, links, search]);
 
-  const display = compact ? links.slice(0, 6) : visible;
+  const display = compact ? links : visible;
 
   return (
     <div>

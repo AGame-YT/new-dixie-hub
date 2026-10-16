@@ -183,3 +183,41 @@ model AdminAuditLog {
   @@index([createdAt])
   @@index([actorEmail, createdAt])
 }
+
+// Pastoral routing for "How are you feeling?" check-ins. In production these
+// rows would be synced from the MIS; the seed adds demo data.
+model PastoralProfile {
+  email     String   @id
+  formGroup String
+  updatedAt DateTime @updatedAt
+}
+
+model PastoralGroup {
+  formGroup  String @id
+  section    String
+  tutorEmail String
+}
+
+model PastoralSection {
+  section   String @id
+  headEmail String
+}
+
+model WellbeingCheckIn {
+  id               String    @id @default(cuid())
+  studentEmail     String
+  studentName      String?
+  formGroup        String?
+  section          String?
+  mood             Int
+  note             String?
+  tutorEmail       String?
+  sectionHeadEmail String?
+  acknowledgedAt   DateTime?
+  acknowledgedBy   String?
+  createdAt        DateTime  @default(now())
+
+  @@index([tutorEmail, createdAt])
+  @@index([sectionHeadEmail, createdAt])
+  @@index([studentEmail, createdAt])
+}
