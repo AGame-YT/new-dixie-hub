@@ -7,7 +7,10 @@ import {
   BookOpenText,
   Briefcase,
   Calculator,
+  CalendarCheck,
   CalendarDays,
+  CalendarPlus,
+  ChevronLeft,
   ChevronRight,
   CircleCheck,
   CirclePlay,
@@ -54,6 +57,7 @@ import {
   Piano,
   Pin,
   Play,
+  Plus,
   Presentation,
   Search,
   Send,
@@ -63,9 +67,13 @@ import {
   Sparkles,
   Star,
   Sun,
+  Trash,
   TriangleAlert,
   Trophy,
-  Users
+  UserCog,
+  UserPlus,
+  Users,
+  X
 } from "lucide-react";
 
 type IconProps = Omit<LucideProps, "ref"> & {
@@ -127,6 +135,14 @@ const icons: Record<string, LucideIcon> = {
   teacher: GraduationCap,
   briefcase: Briefcase,
   pencil: Pencil,
+  plus: Plus,
+  trash: Trash,
+  close: X,
+  back: ChevronLeft,
+  bulletin: CalendarCheck,
+  "calendar-plus": CalendarPlus,
+  "user-plus": UserPlus,
+  roles: UserCog,
   // Subjects
   english: BookOpenText,
   maths: Calculator,

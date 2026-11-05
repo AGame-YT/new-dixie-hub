@@ -5,9 +5,10 @@ import { Icon } from "@/components/Icon";
 import { NoticesList } from "@/components/NewsNotices";
 import { QuickLinks } from "@/components/QuickLinks";
 import { TimetableView } from "@/components/TimetableView";
-import { TrackedLink } from "@/components/TrackedLink";
+import Link from "next/link";
 import { WellbeingInbox } from "@/components/WellbeingInbox";
 import { authOptions } from "@/lib/auth";
+import { upcomingNotices } from "@/lib/bulletin-data";
 import { driveLayoutStandard, schoolNotices, staffLinks } from "@/lib/config";
 import { demoTeacherTimetable } from "@/lib/demo-data";
 import { greeting } from "@/lib/greeting";
@@ -25,7 +26,8 @@ export default async function TeacherPage({
   if (!demo && !session?.isStaff) redirect("/dashboard");
 
   const firstName = session?.user?.name?.split(" ")[0] ?? "Mr Shah";
-  const briefing = staffLinks.find((link) => link.id === "briefing-notes");
+  const notices = (await upcomingNotices({ includeStaff: true })) ?? schoolNotices;
+  const bulletinHref = demo ? "/bulletin?demo=1" : "/bulletin";
 
   return (
     <AppShell
@@ -42,25 +44,16 @@ export default async function TeacherPage({
               {greeting()}, <span>{firstName}</span>
             </h1>
           </div>
-          {briefing && (
-            <TrackedLink
-              href={briefing.url}
-              target="_blank"
-              rel="noreferrer"
-              className="briefing-card"
-              trackingId={briefing.id}
-              trackingLabel={briefing.title}
-            >
-              <span className="quick-link-icon">
-                <Icon name="briefing" size={26} />
-              </span>
-              <span>
-                <strong>Briefing notes</strong>
-                <small>{briefing.description}</small>
-              </span>
-              <Icon name="external" size={16} />
-            </TrackedLink>
-          )}
+          <Link href={bulletinHref} className="briefing-card">
+            <span className="quick-link-icon">
+              <Icon name="calendar-plus" size={26} />
+            </span>
+            <span>
+              <strong>Bulletin</strong>
+              <small>Add or change notices on any date</small>
+            </span>
+            <Icon name="chevron" size={18} />
+          </Link>
         </section>
 
         <QuickLinks links={staffLinks} />
@@ -86,9 +79,17 @@ export default async function TeacherPage({
         <div id="news" className="hub-grid">
           <section className="hub-card">
             <h2 className="hub-card-title">
-              <Icon name="notice" /> Notices
+              <Icon name="notice" /> This week&apos;s bulletin
+              <Link
+                href={bulletinHref}
+                className="icon-button small title-action"
+                aria-label="Open the bulletin calendar"
+                title="Bulletin calendar"
+              >
+                <Icon name="bulletin" size={16} />
+              </Link>
             </h2>
-            <NoticesList notices={schoolNotices} />
+            <NoticesList notices={notices} />
           </section>
           <section id="drive" className="hub-card">
             <h2 className="hub-card-title">

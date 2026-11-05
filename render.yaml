@@ -1,0 +1,22 @@
+# Render Blueprint: a free web service that rebuilds on every push.
+# See SELF-HOSTING.md, option 2.
+services:
+  - type: web
+    name: dixie-hub
+    runtime: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /api/health
+    autoDeploy: true
+    envVars:
+      - key: DATABASE_URL
+        value: file:/app/data/dixie-hub.db
+      - key: NEXTAUTH_SECRET
+        generateValue: true
+      - key: DEMO_MODE
+        value: "true"
+      - key: ADMIN_LOCAL_USERNAME
+        value: dixie-admin
+      # Render asks for this when the Blueprint is created.
+      - key: ADMIN_LOCAL_PASSWORD
+        sync: false

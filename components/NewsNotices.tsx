@@ -18,6 +18,12 @@ export function NoticesList({ notices }: { notices: NoticeItem[] }) {
           </div>
         </li>
       ))}
+      {notices.length === 0 && (
+        <li className="empty-state small">
+          <Icon name="bulletin" />
+          <p>No notices this week.</p>
+        </li>
+      )}
     </ul>
   );
 }

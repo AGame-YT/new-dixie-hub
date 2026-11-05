@@ -2,7 +2,7 @@ import type { NextAuthOptions } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { timingSafeEqual } from "node:crypto";
-import { isAdminEmail, isStaffEmail } from "@/lib/access";
+import { configuredRole, effectiveRole, hasRole, type Role } from "@/lib/roles";
 import { analyticsTypes, recordAnalyticsEvent } from "@/lib/analytics";
 import { prisma } from "@/lib/prisma";
 
@@ -28,6 +28,33 @@ function safeCompare(left?: string, right?: string) {
   const rightBuffer = Buffer.from(right);
   if (leftBuffer.length !== rightBuffer.length) return false;
   return timingSafeEqual(leftBuffer, rightBuffer);
+}
+
+const localAdminId = "local-admin";
+const roleRefreshMs = 60_000;
+
+/** Reads the stored role so promotions and demotions apply within a minute. */
+async function withFreshRole<T extends { email?: string | null; role?: Role; roleCheckedAt?: number }>(
+  token: T
+): Promise<T> {
+  if (token.roleCheckedAt && Date.now() - token.roleCheckedAt < roleRefreshMs) {
+    return token;
+  }
+  try {
+    const stored = token.email
+      ? await prisma.user.findUnique({
+          where: { email: token.email.toLowerCase() },
+          select: { role: true }
+        })
+      : null;
+    return {
+      ...token,
+      role: effectiveRole(token.email, stored?.role),
+      roleCheckedAt: Date.now()
+    };
+  } catch {
+    return { ...token, role: token.role ?? configuredRole(token.email) };
+  }
 }
 
 const enabledScopes = [
@@ -154,7 +181,14 @@ export const authOptions: NextAuthOptions = {
         .toLowerCase()
         .replace(/^@/, "");
       const email = googleProfile?.email?.toLowerCase();
-      const isAllowedAdmin = isAdminEmail(email);
+      let isAllowedStaff = hasRole(configuredRole(email), "TEACHER");
+      if (!isAllowedStaff && email) {
+        // Staff added by an admin may use a different domain from students.
+        const stored = await prisma.user
+          .findUnique({ where: { email }, select: { role: true } })
+          .catch(() => null);
+        isAllowedStaff = hasRole(effectiveRole(email, stored?.role), "TEACHER");
+      }
       const matchesSingleStudent = Boolean(allowedEmail && email === allowedEmail);
       const matchesDomain = Boolean(
         allowedDomain && email?.endsWith(`@${allowedDomain}`)
@@ -163,7 +197,7 @@ export const authOptions: NextAuthOptions = {
 
       if (
         hasRestriction &&
-        !isAllowedAdmin &&
+        !isAllowedStaff &&
         !matchesSingleStudent &&
         !matchesDomain
       ) {
@@ -176,11 +210,11 @@ export const authOptions: NextAuthOptions = {
       if (account?.provider === "admin-credentials") {
         return {
           ...token,
-          sub: user?.id ?? "local-admin",
+          sub: user?.id ?? localAdminId,
           name: user?.name ?? "Dixie Hub Administrator",
           email: user?.email,
-          isAdmin: true,
-          isStaff: true
+          role: "ADMIN" as const,
+          roleCheckedAt: Date.now()
         };
       }
 
@@ -190,6 +224,7 @@ export const authOptions: NextAuthOptions = {
           | undefined;
         const email = googleProfile?.email ?? token.email;
         let databaseUserId = user?.id ?? token.sub;
+        let storedRole: string | undefined;
 
         if (email) {
           try {
@@ -211,6 +246,7 @@ export const authOptions: NextAuthOptions = {
               }
             });
             databaseUserId = databaseUser.id;
+            storedRole = databaseUser.role;
 
             await prisma.oAuthAccount.upsert({
               where: {
@@ -254,14 +290,16 @@ export const authOptions: NextAuthOptions = {
           accessTokenExpires: account.expires_at
             ? account.expires_at * 1000
             : Date.now() + 3600 * 1000,
-          isAdmin: isAdminEmail(email),
-          isStaff: isStaffEmail(email)
+          role: effectiveRole(email, storedRole),
+          roleCheckedAt: Date.now()
         };
       }
 
-      if (token.isAdmin) {
+      if (token.sub === localAdminId) {
         return token;
       }
+
+      token = await withFreshRole(token);
 
       if (
         token.accessToken &&
@@ -278,8 +316,9 @@ export const authOptions: NextAuthOptions = {
         session.user.id = token.sub;
       }
       session.authError = token.authError;
-      session.isAdmin = Boolean(token.isAdmin);
-      session.isStaff = Boolean(token.isStaff) || isStaffEmail(token.email);
+      session.role = token.role ?? configuredRole(token.email);
+      session.isAdmin = hasRole(session.role, "ADMIN");
+      session.isStaff = hasRole(session.role, "TEACHER");
       return session;
     }
   },

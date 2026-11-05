@@ -4,6 +4,11 @@ Dixie Hub is a responsive internal student homepage for Dixie Grammar School. It
 
 The first release is designed for a single Google-authenticated student. It uses live Google Classroom and Gmail data when the relevant APIs are configured and automatically falls back to polished seeded demo data when they are not.
 
+> **Running it from a Chromebook or other browser-only device?** See
+> [SELF-HOSTING.md](SELF-HOSTING.md). It covers a free shareable link that
+> updates on every push, and live editing in GitHub Codespaces, with nothing
+> to install.
+
 ## What is included
 
 - Public hub page with school links, news, notices and Google sign-in
@@ -15,8 +20,11 @@ The first release is designed for a single Google-authenticated student. It uses
 - Homework to-do list with check-off, plus an optional drag-and-drop Kanban view
 - Private "How are you feeling?" check-ins, routed to the student's form tutor and
   head of section (`PastoralProfile` / `PastoralGroup` / `PastoralSection` tables)
-- Teacher view (`/teacher`): timetable, check-ins, notices, briefing notes and the
-  standard student Drive layout. Access via `STAFF_GOOGLE_EMAILS` / `STAFF_GOOGLE_DOMAIN`
+- Teacher view (`/teacher`): timetable, check-ins, this week's bulletin, staff links
+  and the standard student Drive layout
+- Account tiers (Student, Teacher, Admin) managed by admins from `/admin`
+- Shared bulletin calendar (`/bulletin`): staff click any date to add, edit or
+  delete notices, which feed the hub's Notices card
 - Google Classroom read-only service and sync endpoint
 - Gmail metadata-only unread email summary service
 - Daily and weekly timetable UI with demo provider
@@ -28,6 +36,40 @@ The first release is designed for a single Google-authenticated student. It uses
 - Prisma/SQLite schema and seed data
 - Docker image, Compose service and Caddy example for `dh.gs-net.co.uk`
 - Privacy placeholder and minimal-data service boundaries
+
+## Account tiers
+
+| Role | Can do |
+| --- | --- |
+| Student | Use the student hub, read the bulletin (except staff-only notices) |
+| Teacher | Everything above, plus the teacher view, editing the bulletin and reading wellbeing check-ins routed to them |
+| Admin | Everything above, plus **People & roles**, house points and analytics on `/admin` |
+
+The first admin comes from server settings: either `ADMIN_GOOGLE_EMAILS`, or
+the local admin login (`ADMIN_LOCAL_USERNAME` / `ADMIN_LOCAL_PASSWORD`) at
+`/admin/login`. From then on, admins give roles to other people under
+**People & roles** on `/admin`. People can be added by email before they first
+sign in. Changes apply within a minute and are recorded in the audit log.
+
+Server settings set a minimum role. Anyone in `ADMIN_GOOGLE_EMAILS` is always
+an admin, and anyone matching `STAFF_GOOGLE_EMAILS` or `STAFF_GOOGLE_DOMAIN` is
+always at least a teacher. Admins can raise a role above that from `/admin`,
+but can't lower it, and can't change their own role, so the last admin can't
+lock everyone out. Staff given a role in `/admin` can sign in even if their
+email domain differs from `ALLOWED_GOOGLE_DOMAIN`.
+
+## Bulletin
+
+`/bulletin` replaces the monthly bulletin document. It shows a month calendar.
+Staff click any date to add, edit or delete notices. Each notice has a title,
+details, an audience (Everyone, Students, a school section, or Staff only) and
+can be pinned to the top of its day. Any member of staff can edit any notice,
+as with the shared document, and each notice shows who added and last edited
+it. Deletions are written to the audit log.
+
+Staff-only notices are hidden from students. The hub's Notices card and the
+teacher view show the bulletin for today and the next six days. If the
+database isn't available, they fall back to the notices in `lib/config.ts`.
 
 ## Stack
 
@@ -41,6 +83,16 @@ The first release is designed for a single Google-authenticated student. It uses
 ## Local setup
 
 Requirements: Node.js 22 or newer.
+
+On macOS, Linux or GitHub Codespaces, one script does the setup. It creates
+`.env` with random secrets, installs packages and seeds demo data:
+
+```bash
+bash scripts/dev-setup.sh
+npm run dev
+```
+
+On Windows:
 
 ```bash
 npm install
@@ -79,7 +131,10 @@ Copy `.env.example` to `.env` and set:
 | `DEMO_MODE` | Allows the no-account demo and demo persistence endpoint |
 | `ALLOWED_GOOGLE_EMAIL` | Optional single-student allow-list for the prototype |
 | `ALLOWED_GOOGLE_DOMAIN` | Optional school-domain allow-list |
-| `ADMIN_GOOGLE_EMAILS` | Comma-separated Google accounts permitted to use `/admin` |
+| `ADMIN_GOOGLE_EMAILS` | Comma-separated Google accounts that are always admins |
+| `STAFF_GOOGLE_EMAILS` | Comma-separated accounts that are always at least teachers |
+| `STAFF_GOOGLE_DOMAIN` | Email domain whose accounts are always at least teachers |
+| `NEXT_PUBLIC_SCHOOL_VIDEO_URL` | Optional looping video for the hub's side panel |
 | `ADMIN_LOCAL_USERNAME` | Local administrator username used before Google OAuth |
 | `ADMIN_LOCAL_PASSWORD` | Strong server-only local administrator password |
 | `METRICS_BEARER_TOKEN` | Internal secret used by Prometheus to scrape app metrics |
@@ -193,6 +248,9 @@ The Prisma schema contains:
 - `House` and audited `HousePointChange`
 - `AnalyticsEvent`
 - `AdminAuditLog`
+- `User.role` (Student, Teacher or Admin)
+- `BulletinEntry` (the bulletin calendar)
+- `WellbeingCheckIn` and the pastoral routing tables
 
 SQLite is appropriate for this single-student prototype. Move to PostgreSQL before a larger rollout, especially if multiple app replicas or staff administration are introduced.
 

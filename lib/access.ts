@@ -16,7 +16,7 @@ function emailList(value?: string) {
     .filter(Boolean);
 }
 
-/** Staff can open the teacher view. Admins always count as staff. */
+/** Accounts that are always staff, whatever their stored role. Admins count as staff. */
 export function isStaffEmail(email?: string | null) {
   if (!email) return false;
   const normalised = email.toLowerCase();

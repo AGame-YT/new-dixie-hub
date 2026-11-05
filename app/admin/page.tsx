@@ -2,9 +2,9 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getServerSession } from "next-auth";
 import { AdminHouseEditor } from "@/components/AdminHouseEditor";
+import { AdminRoleManager } from "@/components/AdminRoleManager";
 import { BrandMark } from "@/components/BrandMark";
 import { Icon } from "@/components/Icon";
-import { isAdminEmail } from "@/lib/access";
 import { getAdminOverview } from "@/lib/admin-data";
 import { authOptions } from "@/lib/auth";
 
@@ -26,7 +26,7 @@ export default async function AdminPage() {
   if (!session?.user) {
     redirect("/admin/login");
   }
-  if (!session.isAdmin && !isAdminEmail(session.user.email)) {
+  if (!session.isAdmin) {
     return <AdminAccessDenied email={session.user.email} />;
   }
 
@@ -98,6 +98,16 @@ export default async function AdminPage() {
         </section>
 
         <div className="admin-layout">
+          <section id="roles" className="admin-panel admin-roles-panel">
+            <div className="admin-panel-heading">
+              <div>
+                <span className="eyebrow">Account tiers</span>
+                <h2>People &amp; roles</h2>
+              </div>
+            </div>
+            <AdminRoleManager currentEmail={session.user.email} />
+          </section>
+
           <section className="admin-panel admin-house-panel">
             <div className="admin-panel-heading">
               <div>
@@ -251,7 +261,8 @@ function AdminAccessDenied({ email }: { email?: string | null }) {
         <h1>Admin access has not been granted</h1>
         <p>
           You are signed in as <strong>{email ?? "an unknown account"}</strong>,
-          but that address is not listed in <code>ADMIN_GOOGLE_EMAILS</code>.
+          but that account does not have the Admin role. Ask an existing admin to
+          give you the Admin role under <strong>People &amp; roles</strong>.
         </p>
         <div>
           <Link className="button secondary" href="/dashboard">

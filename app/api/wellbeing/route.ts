@@ -1,9 +1,10 @@
 import { getToken } from "next-auth/jwt";
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
-import { isStaffEmail } from "@/lib/access";
 import { demoCheckIns } from "@/lib/demo-data";
 import { prisma } from "@/lib/prisma";
+import { getViewer } from "@/lib/viewer";
+import { hasRole } from "@/lib/roles";
 import { moodLevels, type MoodLevel, type WellbeingCheckInItem } from "@/lib/types";
 
 const maxNoteLength = 500;
@@ -67,8 +68,8 @@ export async function POST(request: NextRequest) {
 
 /** Staff read the check-ins routed to them from the last fortnight. */
 export async function GET(request: NextRequest) {
-  const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET });
-  const email = token?.email?.toLowerCase();
+  const viewer = await getViewer();
+  const email = viewer?.email;
 
   if (!email) {
     if (request.nextUrl.searchParams.get("demo") === "1" && process.env.DEMO_MODE !== "false") {
@@ -76,7 +77,7 @@ export async function GET(request: NextRequest) {
     }
     return NextResponse.json({ error: "Sign in required" }, { status: 401 });
   }
-  if (!isStaffEmail(email) && !token?.isStaff) {
+  if (!hasRole(viewer?.role, "TEACHER")) {
     return NextResponse.json({ error: "Staff only" }, { status: 403 });
   }
 

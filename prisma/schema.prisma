@@ -13,6 +13,8 @@ model User {
   name            String?
   image           String?
   isDemo          Boolean                  @default(false)
+  /// STUDENT, TEACHER or ADMIN. Admins change this from /admin.
+  role            String                   @default("STUDENT")
   loginCount      Int                      @default(0)
   lastLoginAt     DateTime?
   createdAt       DateTime                 @default(now())
@@ -220,4 +222,23 @@ model WellbeingCheckIn {
   @@index([tutorEmail, createdAt])
   @@index([sectionHeadEmail, createdAt])
   @@index([studentEmail, createdAt])
+}
+
+// The shared bulletin: staff add notices to any date from /bulletin.
+model BulletinEntry {
+  id             String   @id @default(cuid())
+  /// School date as YYYY-MM-DD (UK), so entries never shift with timezones.
+  date           String
+  title          String
+  body           String
+  audience       String   @default("Everyone")
+  pinned         Boolean  @default(false)
+  createdByEmail String
+  createdByName  String?
+  updatedByEmail String?
+  updatedByName  String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([date])
 }

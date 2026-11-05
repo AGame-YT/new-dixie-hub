@@ -1,5 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import { learningLinks, schoolNews, schoolNotices } from "../lib/config";
+import { addDays, ukDateKey } from "../lib/bulletin";
 import { demoHomework, demoTimetable } from "../lib/demo-data";
 
 const prisma = new PrismaClient();
@@ -125,6 +126,35 @@ async function main() {
     update: { formGroup: "11B" },
     create: { email: demoUser.email, formGroup: "11B" }
   });
+
+  // Demo bulletin, placed around today so the calendar always has content.
+  if (process.env.DEMO_MODE !== "false") {
+    const today = ukDateKey();
+    const bulletin = [
+      { offset: 0, title: "Sports Day kit reminder", body: "PE kit, water bottle and sun cream. House colours encouraged.", audience: "Everyone", pinned: true },
+      { offset: 0, title: "Chess club moves to L3", body: "Lunchtime chess club meets in L3 this week.", audience: "Students", pinned: false },
+      { offset: 0, title: "Staff briefing 08:20", body: "Short briefing in the staff room. Cover list on the board.", audience: "Staff only", pinned: false },
+      { offset: 1, title: "Senior Prize Giving rehearsal", body: "Students taking part: check rehearsal times in Google Classroom.", audience: "Senior School", pinned: false },
+      { offset: 2, title: "Library summer reading", body: "Borrow up to six books from Monday.", audience: "Everyone", pinned: false },
+      { offset: 4, title: "Year 12 UCAS workshop", body: "Period 5 in the hall. Bring your personal statement draft.", audience: "Sixth Form", pinned: false },
+      { offset: 7, title: "House quiz final", body: "York vs Lancaster, lunchtime in the main hall.", audience: "Everyone", pinned: true },
+      { offset: -1, title: "Mufti day", body: "£1 for the house charity.", audience: "Everyone", pinned: false }
+    ];
+    for (const [index, item] of bulletin.entries()) {
+      const { offset, ...entry } = item;
+      const data = {
+        ...entry,
+        date: addDays(today, offset),
+        createdByEmail: "demo@dixie.example",
+        createdByName: "Dixie Hub demo"
+      };
+      await prisma.bulletinEntry.upsert({
+        where: { id: `demo-bulletin-${index + 1}` },
+        update: data,
+        create: { id: `demo-bulletin-${index + 1}`, ...data }
+      });
+    }
+  }
 
   for (const entry of demoTimetable) {
     await prisma.timetableEntry.upsert({

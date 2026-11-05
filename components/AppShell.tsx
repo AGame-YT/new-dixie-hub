@@ -25,7 +25,7 @@ type AppShellProps = {
 const sectionLinks = [
   { hash: "timetable", label: "Timetable", icon: "calendar" },
   { hash: "homework", label: "Homework", icon: "homework" },
-  { hash: "news", label: "News & notices", icon: "notice" },
+  { hash: "news", label: "News & notices", icon: "news" },
   { hash: "links", label: "All links", icon: "grid" }
 ];
 
@@ -78,6 +78,14 @@ export function AppShell({
               <Icon name={link.icon} />
             </Link>
           ))}
+          <Link
+            href={withDemo("/bulletin")}
+            className={pathname.startsWith("/bulletin") ? "icon-button active" : "icon-button"}
+            aria-label="Bulletin calendar"
+            title="Bulletin calendar"
+          >
+            <Icon name="bulletin" />
+          </Link>
           {(isStaff || demo) && (
             <Link
               href={withDemo("/teacher")}

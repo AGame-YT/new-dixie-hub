@@ -25,6 +25,7 @@ COPY --from=builder /app/prisma ./prisma
 COPY --from=builder /app/lib ./lib
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/tsconfig.json ./tsconfig.json
+COPY --from=builder /app/scripts/start.sh ./scripts/start.sh
 COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static ./.next/static
 
@@ -33,6 +34,6 @@ RUN mkdir -p /app/data
 EXPOSE 3000
 
 HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
-  CMD wget -qO- http://127.0.0.1:3000/api/health >/dev/null || exit 1
+  CMD wget -qO- "http://127.0.0.1:${PORT:-3000}/api/health" >/dev/null || exit 1
 
-CMD ["sh", "-c", "touch /app/data/dixie-hub.db && npx prisma db push && npx prisma db seed && node server.js"]
+CMD ["sh", "/app/scripts/start.sh"]

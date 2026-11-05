@@ -10,6 +10,7 @@ import { QuickLinks } from "@/components/QuickLinks";
 import { SubjectLinks } from "@/components/SubjectLinks";
 import { TimetableView } from "@/components/TimetableView";
 import { authOptions } from "@/lib/auth";
+import { upcomingNotices } from "@/lib/bulletin-data";
 import {
   learningLinks,
   quickLinkIds,
@@ -46,6 +47,8 @@ export default async function DashboardPage({
   const otherLinks = learningLinks.filter(
     (link) => !(quickLinkIds as readonly string[]).includes(link.id)
   );
+  const notices =
+    (await upcomingNotices({ includeStaff: Boolean(session?.isStaff) })) ?? schoolNotices;
   const supportUrl =
     learningLinks.find((link) => link.id === "wellbeing")?.url ?? "https://www.dixie.org.uk";
 
@@ -111,8 +114,16 @@ export default async function DashboardPage({
           <section className="hub-card">
             <h2 className="hub-card-title">
               <Icon name="notice" /> Notices
+              <Link
+                href={demo ? "/bulletin?demo=1" : "/bulletin"}
+                className="icon-button small title-action"
+                aria-label="Open the bulletin calendar"
+                title="Bulletin calendar"
+              >
+                <Icon name="bulletin" size={16} />
+              </Link>
             </h2>
-            <NoticesList notices={schoolNotices} />
+            <NoticesList notices={notices} />
           </section>
         </div>
 

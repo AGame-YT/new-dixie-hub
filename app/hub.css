@@ -1242,3 +1242,359 @@ h4 {
     transform: none;
   }
 }
+
+/* --------------------------------------------------------------- bulletin */
+.bulletin-hero {
+  min-height: 120px;
+}
+
+.bulletin {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(300px, 380px);
+  gap: 20px;
+  align-items: start;
+}
+
+.bulletin-month-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.bulletin-month-header h2 {
+  min-width: 170px;
+  margin: 0;
+  font-size: 28px;
+  text-align: center;
+}
+
+.bulletin-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr)) repeat(2, minmax(0, 0.6fr));
+  gap: 4px;
+}
+
+.bulletin-weekday {
+  padding: 4px 6px;
+  color: var(--ink-soft);
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.bulletin-day {
+  position: relative;
+  display: flex;
+  min-height: 104px;
+  flex-direction: column;
+  gap: 4px;
+  padding: 6px;
+  overflow: hidden;
+  color: var(--ink);
+  text-align: left;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  cursor: pointer;
+  font: inherit;
+}
+
+.bulletin-day:hover {
+  border-color: var(--sky);
+}
+
+.bulletin-day.weekend {
+  background: var(--surface);
+}
+
+.bulletin-day.outside {
+  opacity: 0.45;
+}
+
+.bulletin-day.today .bulletin-day-number {
+  color: var(--navy);
+  background: var(--gold);
+}
+
+.bulletin-day.selected {
+  border: 2px solid var(--navy);
+  box-shadow: 0 0 0 3px var(--gold-soft);
+}
+
+:root[data-theme="dark"] .bulletin-day.selected {
+  border-color: var(--gold);
+}
+
+.bulletin-day-number {
+  display: grid;
+  width: 26px;
+  height: 26px;
+  place-items: center;
+  border-radius: 50%;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.bulletin-chips {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.bulletin-chip {
+  overflow: hidden;
+  padding: 2px 6px;
+  color: var(--navy);
+  background: color-mix(in srgb, var(--sky) 18%, transparent);
+  border-radius: 5px;
+  font-size: 11px;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+:root[data-theme="dark"] .bulletin-chip {
+  color: var(--ink);
+}
+
+.bulletin-chip.pinned {
+  background: var(--gold-soft);
+  border-left: 3px solid var(--gold);
+}
+
+.bulletin-chip.staff {
+  color: white;
+  background: var(--c-slate);
+}
+
+.bulletin-more {
+  color: var(--ink-soft);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.bulletin-dot {
+  display: none;
+}
+
+.bulletin-day-panel {
+  position: sticky;
+  top: 90px;
+}
+
+.bulletin-entries li {
+  align-items: flex-start;
+}
+
+.bulletin-entries li > div {
+  flex: 1;
+}
+
+.bulletin-entries small svg {
+  margin-left: 4px;
+  vertical-align: -1px;
+}
+
+.bulletin-author {
+  display: block;
+  margin-top: 6px;
+  text-transform: none !important;
+  letter-spacing: 0 !important;
+  font-weight: 600 !important;
+}
+
+.bulletin-entry-actions {
+  display: flex;
+  gap: 4px;
+}
+
+.bulletin-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.bulletin-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.bulletin-form input:not([type="checkbox"]),
+.bulletin-form textarea,
+.bulletin-form select,
+.role-add input,
+.role-add select,
+.role-list select {
+  min-height: 40px;
+  padding: 8px 10px;
+  color: var(--ink);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.bulletin-form textarea {
+  resize: vertical;
+}
+
+.bulletin-form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.bulletin-form .bulletin-pin {
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+}
+
+.bulletin-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.demo-banner-small,
+.role-message,
+.role-help {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 0 12px;
+  color: var(--ink-soft);
+  font-size: 13px;
+}
+
+.role-message {
+  padding: 8px 10px;
+  color: var(--ink);
+  background: var(--gold-soft);
+  border-radius: 10px;
+}
+
+/* ------------------------------------------------------------ roles admin */
+.admin-roles-panel {
+  grid-column: 1 / -1;
+}
+
+.role-add {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.role-add label:first-child {
+  flex: 1 1 240px;
+}
+
+.role-add input {
+  width: 100%;
+}
+
+.role-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.role-list li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+
+.role-badge {
+  display: grid;
+  width: 32px;
+  height: 32px;
+  flex: 0 0 auto;
+  place-items: center;
+  color: white;
+  background: var(--c-teal);
+  border-radius: 9px;
+}
+
+.role-badge.admin {
+  color: var(--navy);
+  background: var(--gold);
+}
+
+.role-person {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  flex-direction: column;
+}
+
+.role-person strong,
+.role-person small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.role-person small {
+  color: var(--ink-soft);
+  font-size: 12px;
+}
+
+@media (max-width: 1080px) {
+  .bulletin {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .bulletin-day-panel {
+    position: static;
+  }
+}
+
+@media (max-width: 720px) {
+  .bulletin-grid {
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+  }
+
+  .bulletin-day {
+    min-height: 48px;
+    align-items: center;
+    padding: 4px 2px;
+  }
+
+  .bulletin-chips {
+    display: none;
+  }
+
+  .bulletin-dot {
+    display: block;
+    width: 6px;
+    height: 6px;
+    background: var(--gold-deep);
+    border-radius: 50%;
+  }
+
+  .bulletin-month-header h2 {
+    min-width: 0;
+    flex: 1;
+    font-size: 22px;
+  }
+
+  .bulletin-form-row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

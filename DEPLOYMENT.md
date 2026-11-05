@@ -1,7 +1,8 @@
 # Dev server deployment
 
 This runbook deploys Dixie Hub at `https://dh.gs-net.co.uk` using Docker
-Compose and an existing Caddy container.
+Compose and an existing Caddy container. To run it without a server, from
+just a browser, see [SELF-HOSTING.md](SELF-HOSTING.md).
 
 ## 1. Create a repository deploy key
 
@@ -199,7 +200,9 @@ Leave Gmail disabled until the school has approved the Gmail metadata scope.
 
 Before Google OAuth is ready, the administrator signs in at `/admin/login`
 using `ADMIN_LOCAL_USERNAME` and `ADMIN_LOCAL_PASSWORD`. Once Google OAuth is
-configured, approved Google accounts may also use `/admin`.
+configured, approved Google accounts may also use `/admin`. Under **People &
+roles** on `/admin`, give at least one other member of staff the Admin role,
+so the hub can be run without whoever set up the server.
 Grafana has a separate login at `/grafana/` using `GRAFANA_ADMIN_USER` and
 `GRAFANA_ADMIN_PASSWORD`. Keep both admin systems non-public and do not enable
 Grafana anonymous access.
