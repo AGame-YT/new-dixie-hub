@@ -101,3 +101,27 @@ export type WellbeingCheckInItem = {
   createdAt: string;
   acknowledged: boolean;
 };
+
+export type FixtureItem = {
+  id: string;
+  /** ISO date (YYYY-MM-DD). */
+  date: string;
+  time: string;
+  sport: string;
+  team: string;
+  opponent: string;
+  venue: "Home" | "Away";
+  location: string;
+  /** Pupils selected for the team. Everyone else is "not playing". */
+  squad: string[];
+  note?: string;
+};
+
+export type BadgeItem = {
+  id: string;
+  name: string;
+  /** One of the five school values: respect, resilience, courage, commitment, care. */
+  value: string;
+  count: number;
+  awardedFor: string;
+};

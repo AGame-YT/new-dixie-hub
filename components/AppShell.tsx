@@ -25,7 +25,8 @@ type AppShellProps = {
 const sectionLinks = [
   { hash: "timetable", label: "Timetable", icon: "calendar" },
   { hash: "homework", label: "Homework", icon: "homework" },
-  { hash: "news", label: "News & notices", icon: "news" },
+  { hash: "fixtures", label: "Fixtures", icon: "trophy" },
+  { hash: "notices", label: "Notices", icon: "notice" },
   { hash: "links", label: "All links", icon: "grid" }
 ];
 
@@ -133,7 +134,6 @@ export function AppShell({
           </span>
         </div>
       </header>
-      <div className="leopard-band" aria-hidden="true" />
 
       <div className={media ? "hub-body with-media" : "hub-body"}>
         {media && <SchoolMediaRail />}

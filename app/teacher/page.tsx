@@ -9,7 +9,8 @@ import Link from "next/link";
 import { WellbeingInbox } from "@/components/WellbeingInbox";
 import { authOptions } from "@/lib/auth";
 import { upcomingNotices } from "@/lib/bulletin-data";
-import { driveLayoutStandard, schoolNotices, staffLinks } from "@/lib/config";
+import { SubjectLinks } from "@/components/SubjectLinks";
+import { driveLayoutStandard, schoolNotices, staffLinks, teacherSubjectLinks } from "@/lib/config";
 import { demoTeacherTimetable } from "@/lib/demo-data";
 import { greeting } from "@/lib/greeting";
 
@@ -27,7 +28,7 @@ export default async function TeacherPage({
 
   const firstName = session?.user?.name?.split(" ")[0] ?? "Mr Shah";
   const notices = (await upcomingNotices({ includeStaff: true })) ?? schoolNotices;
-  const bulletinHref = demo ? "/bulletin?demo=1" : "/bulletin";
+  const bulletinHref = demo ? "/bulletin?demo=1&as=teacher" : "/bulletin";
 
   return (
     <AppShell
@@ -59,13 +60,13 @@ export default async function TeacherPage({
         <QuickLinks links={staffLinks} />
 
         <div className="hub-grid">
-          <section id="timetable" className="hub-card">
+          <section id="timetable" className="hub-card value-respect teacher-card">
             <h2 className="hub-card-title">
               <Icon name="calendar" /> Timetable
             </h2>
             <TimetableView entries={demoTeacherTimetable} />
           </section>
-          <section id="wellbeing" className="hub-card">
+          <section id="wellbeing" className="hub-card value-care teacher-card">
             <h2 className="hub-card-title">
               <Icon name="heart" /> How students are feeling
               <span className="mood-private" title="Only you and the other pastoral lead for this form can see these">
@@ -77,7 +78,7 @@ export default async function TeacherPage({
         </div>
 
         <div id="news" className="hub-grid">
-          <section className="hub-card">
+          <section className="hub-card value-courage teacher-card">
             <h2 className="hub-card-title">
               <Icon name="notice" /> This week&apos;s bulletin
               <Link
@@ -91,7 +92,7 @@ export default async function TeacherPage({
             </h2>
             <NoticesList notices={notices} />
           </section>
-          <section id="drive" className="hub-card">
+          <section id="drive" className="hub-card value-commitment teacher-card">
             <h2 className="hub-card-title">
               <Icon name="drive" /> Student Drive layout
             </h2>
@@ -112,6 +113,16 @@ export default async function TeacherPage({
             </ol>
           </section>
         </div>
+
+        <section id="subject-drive" className="hub-card value-resilience teacher-card">
+          <h2 className="hub-card-title">
+            <Icon name="folder-open" /> My subject Google Drive
+          </h2>
+          <p className="muted">
+            Open your department&apos;s shared Drive folder or Classroom class.
+          </p>
+          <SubjectLinks subjects={teacherSubjectLinks} />
+        </section>
       </div>
     </AppShell>
   );

@@ -1,4 +1,5 @@
 import type {
+  FixtureItem,
   LearningLinkItem,
   NewsItem,
   NoticeItem,
@@ -385,3 +386,64 @@ export const schoolMedia = {
     { src: "/brand/care.jpg", caption: "Care" }
   ]
 };
+
+const fixtureDay = (daysFromNow: number) => {
+  const value = new Date();
+  value.setDate(value.getDate() + daysFromNow);
+  return value.toISOString().slice(0, 10);
+};
+
+/**
+ * Demo fixtures. Replace with the PE department's list (or a Google Sheet);
+ * names in `squad` are the pupils playing, everyone else is not selected.
+ */
+export const sportsFixtures: FixtureItem[] = [
+  {
+    id: "fx-1",
+    date: fixtureDay(0),
+    time: "14:00",
+    sport: "Football",
+    team: "U14 A",
+    opponent: "Akeley Wood",
+    venue: "Home",
+    location: "Dixie playing fields",
+    squad: ["Alex Morgan", "Sam Okafor", "Jake Turner", "Leo Patel", "Ben Carter", "Max Evans"]
+  },
+  {
+    id: "fx-2",
+    date: fixtureDay(1),
+    time: "15:30",
+    sport: "Netball",
+    team: "U13 A",
+    opponent: "Stowe",
+    venue: "Away",
+    location: "Stowe School",
+    squad: ["Priya Shah", "Ella Brooks", "Maya Hughes", "Chloe Webb", "Isla Reid"],
+    note: "Minibus leaves at 14:15"
+  },
+  {
+    id: "fx-3",
+    date: fixtureDay(3),
+    time: "13:30",
+    sport: "Rugby",
+    team: "U15 XV",
+    opponent: "Oakham",
+    venue: "Away",
+    location: "Oakham School",
+    squad: ["Tom Ashby", "Will Foster", "Noah Clarke", "Harry Dixon", "Alex Morgan"]
+  },
+  {
+    id: "fx-4",
+    date: fixtureDay(5),
+    time: "10:00",
+    sport: "Hockey",
+    team: "U12 A",
+    opponent: "Bloxham",
+    venue: "Home",
+    location: "Dixie astro",
+    squad: ["Amelia Ward", "Grace Lewis", "Ruby Khan", "Freya Moss", "Zara Ali"]
+  }
+];
+
+/** Teachers' department Google Drive folders. Replace each URL with the real shared folder. */
+export const teacherSubjectLinks = subjectLinks;
