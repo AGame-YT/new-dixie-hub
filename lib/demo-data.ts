@@ -1,5 +1,6 @@
 import { subjectStyle } from "@/lib/config";
 import type {
+  BadgeItem,
   EmailSummaryItem,
   HomeworkItem,
   TimetableItem,
@@ -224,4 +225,13 @@ export const demoCheckIns: WellbeingCheckInItem[] = [
     createdAt: isoAt(-1, 13),
     acknowledged: true
   }
+];
+
+/** ePraise-style recognition: one badge type per school value. */
+export const demoBadges: BadgeItem[] = [
+  { id: "b-respect", name: "Respect", value: "respect", count: 6, awardedFor: "Helping a new student settle in" },
+  { id: "b-resilience", name: "Resilience", value: "resilience", count: 4, awardedFor: "Redrafting your essay after feedback" },
+  { id: "b-courage", name: "Courage", value: "courage", count: 3, awardedFor: "Presenting in assembly" },
+  { id: "b-commitment", name: "Commitment", value: "commitment", count: 9, awardedFor: "Every homework handed in on time" },
+  { id: "b-care", name: "Care", value: "care", count: 5, awardedFor: "Looking after the Year 7 buddies" }
 ];

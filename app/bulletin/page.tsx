@@ -9,12 +9,13 @@ export const metadata = { title: "Bulletin" };
 export default async function BulletinPage({
   searchParams
 }: {
-  searchParams: Promise<{ demo?: string }>;
+  searchParams: Promise<{ demo?: string; as?: string }>;
 }) {
   const params = await searchParams;
   const session = await getServerSession(authOptions);
   const demo = params.demo === "1" || !session?.user;
-  const canEdit = demo || Boolean(session?.isStaff);
+  // Students can only read the bulletin. The demo teacher preview (?as=teacher) can edit.
+  const canEdit = demo ? params.as === "teacher" : Boolean(session?.isStaff);
 
   return (
     <AppShell

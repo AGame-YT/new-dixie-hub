@@ -5,7 +5,10 @@ import { HomeworkPanel } from "@/components/HomeworkPanel";
 import { Icon } from "@/components/Icon";
 import { LearningLinksGrid } from "@/components/LearningLinksGrid";
 import { MoodCheckIn } from "@/components/MoodCheckIn";
-import { NewsList, NoticesList } from "@/components/NewsNotices";
+import { BadgesReports } from "@/components/BadgesReports";
+import { FixturesList } from "@/components/FixturesList";
+import { NoticesList } from "@/components/NewsNotices";
+import { ValuePictures } from "@/components/ValuePictures";
 import { QuickLinks } from "@/components/QuickLinks";
 import { SubjectLinks } from "@/components/SubjectLinks";
 import { TimetableView } from "@/components/TimetableView";
@@ -14,11 +17,11 @@ import { upcomingNotices } from "@/lib/bulletin-data";
 import {
   learningLinks,
   quickLinkIds,
-  schoolNews,
   schoolNotices,
+  sportsFixtures,
   subjectLinks
 } from "@/lib/config";
-import { demoHomework, demoTimetable } from "@/lib/demo-data";
+import { demoBadges, demoHomework, demoTimetable } from "@/lib/demo-data";
 import { greeting } from "@/lib/greeting";
 
 export const metadata = { title: "Dashboard" };
@@ -76,7 +79,7 @@ export default async function DashboardPage({
           <MoodCheckIn demo={demo} supportUrl={supportUrl} />
         </section>
 
-        <QuickLinks links={quickLinks} />
+        <ValuePictures />
 
         <div className="hub-grid">
           <section id="timetable" className="hub-card">
@@ -94,44 +97,52 @@ export default async function DashboardPage({
           </section>
         </div>
 
-        <div id="news" className="hub-grid">
-          <section className="hub-card">
-            <h2 className="hub-card-title">
-              <Icon name="news" /> News
-              <a
-                href="https://www.dixie.org.uk/news-events"
-                target="_blank"
-                rel="noreferrer"
-                className="icon-button small title-action"
-                aria-label="More news on the school website"
-                title="More news"
-              >
-                <Icon name="external" size={16} />
-              </a>
-            </h2>
-            <NewsList news={schoolNews} />
-          </section>
-          <section className="hub-card">
-            <h2 className="hub-card-title">
-              <Icon name="notice" /> Notices
-              <Link
-                href={demo ? "/bulletin?demo=1" : "/bulletin"}
-                className="icon-button small title-action"
-                aria-label="Open the bulletin calendar"
-                title="Bulletin calendar"
-              >
-                <Icon name="bulletin" size={16} />
-              </Link>
-            </h2>
-            <NoticesList notices={notices} />
-          </section>
-        </div>
+        <section id="fixtures" className="hub-card">
+          <h2 className="hub-card-title">
+            <Icon name="trophy" /> Sports fixtures
+            <span className="mood-private">Who&apos;s playing</span>
+          </h2>
+          <FixturesList fixtures={sportsFixtures} viewerName={demo ? "Alex Morgan" : user?.name} />
+        </section>
+
+        <section id="notices" className="hub-card">
+          <h2 className="hub-card-title">
+            <Icon name="notice" /> Notices
+            <Link
+              href={demo ? "/bulletin?demo=1" : "/bulletin"}
+              className="icon-button small title-action"
+              aria-label="Open the bulletin calendar"
+              title="Bulletin calendar"
+            >
+              <Icon name="bulletin" size={16} />
+            </Link>
+          </h2>
+          <NoticesList notices={notices} />
+        </section>
 
         <section id="subjects" className="hub-card">
           <h2 className="hub-card-title">
             <Icon name="folder-open" /> My subjects
           </h2>
           <SubjectLinks subjects={subjectLinks} />
+        </section>
+
+        <section id="badges" className="hub-card">
+          <h2 className="hub-card-title">
+            <Icon name="award" /> Badges &amp; reports
+          </h2>
+          <BadgesReports
+            badges={demoBadges}
+            studentName={demo ? "Alex Morgan" : (user?.name ?? "Student")}
+            demo={demo}
+          />
+        </section>
+
+        <section id="quick" className="hub-card">
+          <h2 className="hub-card-title">
+            <Icon name="external" /> Quick links
+          </h2>
+          <QuickLinks links={quickLinks} />
         </section>
 
         <section id="links" className="hub-card">
